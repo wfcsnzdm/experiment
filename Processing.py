@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import resample
 import os
+from Smote import Smote
 class Processing():
     def __init__(self):
         self.folder_name = "data"
@@ -78,3 +79,37 @@ class Processing():
         testing_data_y = testing_data[:, k - 1]
 
         return training_data_X, training_data_y, testing_data_X, testing_data_y
+
+
+    def refreshData(self,dataX, dataY):
+        '''
+        这个函数用来处理 datay非0的数据，因为要对非0的值进行上采样，所以把非0的值找出来。
+        :param dataX: 原始数据集的X
+        :param dataY: 原始数据集的y
+        :return: 为0的特征个数，和非0的dataX 和 datay
+        '''
+        bugDataX = []
+        bugDataY = []
+        count = 0
+        dataY = np.matrix(dataY).T
+        dataX = np.array(dataX)
+        for i in range(len(dataY)):
+            if dataY[i] == 0:
+                count += 1
+            else:
+                bugDataX.append(dataX[i])
+                bugDataY.append(int(dataY[i]))
+        return count, bugDataX, bugDataY
+
+    def dealData(self,X, y,ratio=1):
+        # SMOTE algorithm
+        count, BugdataX, Bugdatay = self.refreshData(X, y)
+        count = len(y) - count
+        T = ratio * (len(y)-count) - count
+        N = int(T/(count*0.01))
+        add_X, add_y = Smote(BugdataX, Bugdatay, N, 5).over_sampling()
+        # Conversion format
+        add_y = np.array(add_y)
+        y = np.hstack((y, add_y))
+        X = np.vstack((X, add_X))
+        return X, y
