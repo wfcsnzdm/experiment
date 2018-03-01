@@ -34,15 +34,16 @@ class Smote:
             self.N = 100
 
         N = int(self.N / 100)  # 每个少数类样本应该合成的新样本个数
+        print('N is',N)
         self.synthetic = np.zeros((self.n_samples * N, self.n_attrs))
         self.label = []
         self.new_index = 0
-
+        print(np.shape(self.samples))
         neighbors = NearestNeighbors(n_neighbors=self.k).fit(self.samples)
         print("neighbors", neighbors)
 
         for i in range(len(self.samples)):
-            nnarray = neighbors.kneighbors(self.samples[i], return_distance=False)[0]
+            nnarray = neighbors.kneighbors(self.samples, return_distance=False)[0]
             # 存储k个近邻的下标
             self.__populate(N, i, nnarray)
         return self.synthetic, self.label
