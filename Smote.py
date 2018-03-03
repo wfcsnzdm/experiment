@@ -34,7 +34,6 @@ class Smote:
             self.N = 100
 
         N = int(self.N / 100)  # 每个少数类样本应该合成的新样本个数
-        print('N is',N)
         self.synthetic = np.zeros((self.n_samples * N, self.n_attrs))
         self.label = []
         self.new_index = 0
@@ -55,8 +54,8 @@ class Smote:
             dif = self.samples[nnarray[nn]] - self.samples[i]  # 包含类标
             gap = np.random.rand(1, self.n_attrs)
             self.synthetic[self.new_index] = self.samples[i] + gap.flatten() * dif
-            dist1 = (float)(np.linalg.norm(self.synthetic[self.new_index] - self.samples[nnarray[nn]]))
-            dist2 = (float)(np.linalg.norm(self.synthetic[self.new_index] - self.samples[i]))
+            dist2 = (float)(np.linalg.norm(self.synthetic[self.new_index] - self.samples[nnarray[nn]]))
+            dist1 = (float)(np.linalg.norm(self.synthetic[self.new_index] - self.samples[i]))
             if (dist1 + dist2 != 0):
                 self.label.append((dist1 * self.Y[nnarray[nn]] + dist2 * self.Y[i]) / (dist1 + dist2))
             else:
