@@ -41,11 +41,11 @@ def pred_result_boost(training_data_X, training_data_y, test_data_X, ratio =1, n
 
     '''
     rng = np.random.RandomState(1)
-    dtr = RAdaBoostRegressor(DecisionTreeRegressor(max_depth=4), n_estimators=n_estimators, random_state=rng).fit(training_data_X, training_data_y)
+    dtr = RAdaBoostRegressor(DecisionTreeRegressor(max_depth=4), n_estimators=n_estimators, random_state=rng).fit(training_data_X, training_data_y, ratio=ratio)
 
-    lr = RAdaBoostRegressor(linear_model.LinearRegression(),n_estimators=n_estimators, random_state=rng).fit(training_data_X, training_data_y)
+    lr = RAdaBoostRegressor(linear_model.LinearRegression(),n_estimators=n_estimators, random_state=rng).fit(training_data_X, training_data_y, ratio=ratio)
 
-    bayes = RAdaBoostRegressor(BayesianRidge(),n_estimators = n_estimators, random_state=rng).fit(training_data_X, training_data_y)
+    bayes = RAdaBoostRegressor(BayesianRidge(),n_estimators = n_estimators, random_state=rng).fit(training_data_X, training_data_y, ratio=ratio)
 
     return [np.around(dtr.predict(test_data_X)), np.around(lr.predict(test_data_X)), np.around(bayes.predict(test_data_X))]
 
