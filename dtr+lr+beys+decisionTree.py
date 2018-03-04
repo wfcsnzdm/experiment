@@ -16,6 +16,8 @@ from RandomUnderSampler import RandomUnderSampler
 
 from RusAdaBoostRegressor import RAdaBoostRegressor
 
+from SmoteAdaBoostRegressor import SAdaBoostRegressor
+
 def pred_result(training_data_X, training_data_y,test_data_X):
 
     '''
@@ -33,6 +35,11 @@ def pred_result(training_data_X, training_data_y,test_data_X):
     return [np.around(dtr.predict(test_data_X)), np.around(lr.predict(test_data_X)), np.around(bayes.predict(test_data_X))]
 
 def pred_result_boost(training_data_X, training_data_y, test_data_X, ratio =1, n_estimators =100):
+    '''
+
+    :return: 用rus下采样的adaboostRegressor，使用3个不同的回归模型预测，预测值取整。
+
+    '''
     rng = np.random.RandomState(1)
     dtr = RAdaBoostRegressor(DecisionTreeRegressor(max_depth=4), n_estimators=n_estimators, random_state=rng).fit(training_data_X, training_data_y)
 
@@ -42,8 +49,20 @@ def pred_result_boost(training_data_X, training_data_y, test_data_X, ratio =1, n
 
     return [np.around(dtr.predict(test_data_X)), np.around(lr.predict(test_data_X)), np.around(bayes.predict(test_data_X))]
 
+def pred_result_smoteboost(training_data_X, training_data_y, test_data_X, ratio =1, n_estimators =100):
+    '''
 
+    :return: 用smote上采样的adaboostRegressor，使用3个不同的回归模型预测，预测值取整。
 
+    '''
+    rng = np.random.RandomState(1)
+    dtr = SAdaBoostRegressor(DecisionTreeRegressor(max_depth=4), n_estimators=n_estimators, random_state=rng).fit(training_data_X, training_data_y,ratio=ratio)
+
+    lr = SAdaBoostRegressor(linear_model.LinearRegression(),n_estimators=n_estimators, random_state=rng).fit(training_data_X, training_data_y,ratio=ratio)
+
+    bayes = SAdaBoostRegressor(BayesianRidge(),n_estimators = n_estimators, random_state=rng).fit(training_data_X, training_data_y,ratio=ratio)
+
+    return [np.around(dtr.predict(test_data_X)), np.around(lr.predict(test_data_X)), np.around(bayes.predict(test_data_X))]
 
 def bootstrap():
 
@@ -63,7 +82,11 @@ def bootstrap():
 
     #rus + adaboostr2
 
-    rus_boostr2_pred = pred_result_boost(training_data_X, training_data_y, testing_data_X)
+    rus_boostr2_pred = pred_result_boost(training_data_X, training_data_y, testing_data_X, ratio=1.0)
+
+    #smote + adaboostr2
+
+    smote_boostr2_pred = pred_result_smoteboost(training_data_X, training_data_y, testing_data_X,ratio=1.0)
 
 
     for i in y_pred:
@@ -113,6 +136,18 @@ def bootstrap():
         print('rus_boostr2 FPA',fpa)
 
         print('rus_boostr2 Meanad',mad_dict)
+
+    for i in smote_boostr2_pred:
+
+        fpa = PerformanceMeasure(testing_data_y,i).FPA()
+
+        key, val = PerformanceMeasure(testing_data_y,i).AEE()
+
+        mad_dict = dict(zip(key,val))
+
+        print('smote_boostr2 FPA',fpa)
+
+        print('smote_boostr2 Meanad',mad_dict)
 # 决策树  线性回归 贝叶斯
 
 if __name__ == '__main__':

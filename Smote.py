@@ -37,9 +37,7 @@ class Smote:
         self.synthetic = np.zeros((self.n_samples * N, self.n_attrs))
         self.label = []
         self.new_index = 0
-        print(np.shape(self.samples))
         neighbors = NearestNeighbors(n_neighbors=self.k).fit(self.samples)
-        print("neighbors", neighbors)
 
         for i in range(len(self.samples)):
             nnarray = neighbors.kneighbors(self.samples, return_distance=False)[0]
