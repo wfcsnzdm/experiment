@@ -121,9 +121,6 @@ class RandomUnderSampler(BaseMulticlassSampler):
         if self.return_indices:
             idx_under = np.nonzero(y >= self.min_c_)[0]
 
-        if self.return_indices:
-            pass
-
         # Loop over the other classes under-picking at random
         for key in self.stats_c_.keys():
 
@@ -136,11 +133,6 @@ class RandomUnderSampler(BaseMulticlassSampler):
             indx = random_state.choice(
                 indx, size=num_samples, replace=self.replacement)
 
-
-
-            # Concatenate to the minority class
-
-
             # If we need to offer support for the indices selected
             if self.return_indices:
                 k = X[y == key][indx]
@@ -151,7 +143,6 @@ class RandomUnderSampler(BaseMulticlassSampler):
                     lis.append(xx.index(i))
                 lis = np.array(lis)
                 idx_under = np.concatenate((idx_under, lis), axis=0)
-
 
             X_resampled = np.concatenate(
                 (X_resampled, X[y == key][indx]), axis=0)
