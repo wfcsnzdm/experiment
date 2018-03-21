@@ -18,6 +18,8 @@ from RusAdaBoostRegressor import RAdaBoostRegressor
 
 from SmoteAdaBoostRegressor import SAdaBoostRegressor
 
+from sklearn.ensemble import AdaBoostRegressor
+
 def pred_result(training_data_X, training_data_y,test_data_X):
 
     '''
@@ -34,7 +36,20 @@ def pred_result(training_data_X, training_data_y,test_data_X):
 
     return [np.around(dtr.predict(test_data_X)), np.around(lr.predict(test_data_X)), np.around(bayes.predict(test_data_X))]
 
-def pred_result_boost(training_data_X, training_data_y, test_data_X, ratio =1, n_estimators =100):
+
+def pred_result_boost(training_data_X, training_data_y, test_data_X, ratio =1, n_estimators = 100):
+
+    rng = np.random.RandomState(1)
+    dtr  = AdaBoostRegressor(DecisionTreeRegressor(),n_estimators=n_estimators,random_state=rng).fit(training_data_X, training_data_y)
+
+    lr  = AdaBoostRegressor(linear_model.LinearRegression(),n_estimators=n_estimators,random_state=rng).fit(training_data_X, training_data_y)
+
+    bayes  = AdaBoostRegressor(BayesianRidge(),n_estimators=n_estimators,random_state=rng).fit(training_data_X, training_data_y)
+
+    return [np.around(dtr.predict(test_data_X)), np.around(lr.predict(test_data_X)), np.around(bayes.predict(test_data_X))]
+
+
+def pred_result_rusboost(training_data_X, training_data_y, test_data_X, ratio =1, n_estimators =100):
     '''
 
     :return: 用rus下采样的adaboostRegressor，使用3个不同的回归模型预测，预测值取整。
@@ -80,9 +95,14 @@ def bootstrap():
 
     smote_pred = pred_result(smote_training_data_X, smote_training_data_y, testing_data_X)
 
+
+    #adaboostr2
+
+    adaboostr2_pred = pred_result_boost(training_data_X, training_data_y, testing_data_X)
+
     #rus + adaboostr2
 
-    rus_boostr2_pred = pred_result_boost(training_data_X, training_data_y, testing_data_X, ratio=1.0)
+    rus_boostr2_pred = pred_result_rusboost(training_data_X, training_data_y, testing_data_X, ratio=1.0)
 
     #smote + adaboostr2
 
@@ -124,6 +144,18 @@ def bootstrap():
         print('Smote FPA',fpa)
 
         print('Smote Meanad',mad_dict)
+
+    for i in adaboostr2_pred :
+
+        fpa = PerformanceMeasure(testing_data_y,i).FPA()
+
+        key, val = PerformanceMeasure(testing_data_y,i).AEE()
+
+        mad_dict = dict(zip(key,val))
+
+        print('No anything adaboostr2 FPA',fpa)
+
+        print('No anything adaboostr2 Meanad',mad_dict)
 
     for i in rus_boostr2_pred:
 
